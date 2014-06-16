@@ -1,0 +1,44 @@
+{
+  "name": "thot-gen",
+  "version": "0.1.0",
+  "description": "Generator control flow based on bluebird",
+  "main": "index.js",
+  "dependencies": {
+    "benchmark": "^1.0.0",
+    "bluebird": "^2.1.2",
+    "lodash": "^2.4.1",
+    "sliced": "0.0.5"
+  },
+  "devDependencies": {
+    "benchmark": "^1.0.0",
+    "co": "^3.0.6",
+    "concur": "^1.2.2",
+    "galaxy": "^0.1.7",
+    "gen-run": "^0.1.1",
+    "genny": "^0.5.5",
+    "gens": "^1.0.2",
+    "suspend": "^0.5.1",
+    "why": "^0.1.12"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thotjs/thot-gen.git"
+  },
+  "keywords": [
+    "ThotJS",
+    "Thot",
+    "generators",
+    "promises",
+    "control",
+    "flow"
+  ],
+  "author": "Joshwa Fugett <jfugett@thotjs.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thotjs/thot-gen/issues"
+  },
+  "homepage": "https://github.com/thotjs/thot-gen"
+}

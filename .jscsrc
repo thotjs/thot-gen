@@ -1,0 +1,30 @@
+{
+  "requireCurlyBraces": [
+    "if",
+    "else",
+    "for",
+    "while",
+    "do",
+    "try",
+    "catch"
+  ],
+  "requireParenthesesAroundIIFE": true,
+  "disallowMultipleVarDecl": true,
+  "disallowEmptyBlocks": true,
+  "requireCommaBeforeLineBreak": true,
+  "validateQuoteMarks": true,
+  "validateIndentation": 2,
+  "disallowMixedSpacesAndTabs": true,
+  "disallowTrailingWhitespace": true,
+  "disallowKeywordsOnNewLine": ["else"],
+  "maximumLineLength": 150,
+  "requireCapitalizedConstructors": true,
+  "safeContextKeyword": "self",
+  "requireDotNotation": true,
+  "disallowYodaConditions": true,
+  "validateJSDoc": {
+    "checkParamNames": true,
+    "checkRedundantParams": true,
+    "requireParamTypes": true
+  }
+}
