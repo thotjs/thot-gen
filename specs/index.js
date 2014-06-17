@@ -1,5 +1,5 @@
 'use strict';
-var final = require('../final');
+var final = require('../index');
 var run = final.run;
 
 var Q = require('q');
