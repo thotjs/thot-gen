@@ -1,3 +1,4 @@
 'use strict';
 
-require('./empty.js');
+require('./empty');
+require('./promise');

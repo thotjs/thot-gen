@@ -15,49 +15,63 @@ function done(deferred){
   };
 }
 
-suite.add('thot-gen empty', {
+function thunk(){
+  return function(cb){
+    cb(null, true);
+  };
+}
+
+suite.add('thot-gen thunk', {
   'defer': true,
   'async': true,
-  'minSamples': 100,
+  'minSamples': 1000,
+  'initCount': 100,
   'fn': function(deferred){
     var end = done(deferred);
     thotGen.run(function * (){
+      yield thunk();
       return false;
     })(end);
   }
 });
 
-suite.add('co empty', {
+suite.add('co thunk', {
   'defer': true,
   'async': true,
-  'minSamples': 100,
+  'minSamples': 1000,
+  'initCount': 100,
   'fn': function(deferred){
     var end = done(deferred);
     co(function * (){
+      yield thunk();
       return false;
     })(end);
   }
 });
 
-suite.add('gen-run empty', {
+suite.add('gen-run thunk', {
   'defer': true,
   'async': true,
-  'minSamples': 100,
+  'minSamples': 1000,
+  'initCount': 100,
   'fn': function(deferred){
     var end = done(deferred);
     gen(function * (){
+      yield thunk();
       return false;
     }, end);
   }
 });
 
-suite.add('suspend empty', {
+suite.add('suspend thunk', {
   'defer': true,
   'async': true,
-  'minSamples': 100,
+  'minSamples': 1000,
+  'initCount': 100,
   'fn': function(deferred){
     var end = done(deferred);
     suspend.run(function * (){
+      yield thunk();
       return false;
     }, end);
   }
