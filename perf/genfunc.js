@@ -10,58 +10,68 @@ var Benchmark = require('benchmark');
 
 var suite = new Benchmark.Suite({'async': true, 'minSamples': 100});
 
-var prom = Promise.resolve(1);
-
 function done(deferred){
   return function(){
     deferred.resolve();
   };
 }
 
-suite.add('thot-gen promise', {
+suite.add('thot-gen generator functions', {
   'defer': true,
   'async': true,
   'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     thotGen.run(function * (){
-      yield prom;
+      return false;
     })(end);
   }
 });
 
-suite.add('co promise', {
+suite.add('co empty', {
   'defer': true,
   'async': true,
   'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     co(function * (){
-      yield prom;
+      return false;
     })(end);
   }
 });
 
-suite.add('suspend prom', {
+suite.add('gen-run empty', {
+  'defer': true,
+  'async': true,
+  'minSamples': 100,
+  'fn': function(deferred){
+    var end = done(deferred);
+    gen(function * (){
+      return false;
+    }, end);
+  }
+});
+
+suite.add('suspend empty', {
   'defer': true,
   'async': true,
   'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     suspend.run(function * (){
-      yield prom;
+      return false;
     }, end);
   }
 });
 
-suite.add('genny prom', {
+suite.add('genny empty', {
   'defer': true,
   'async': true,
   'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
-    genny.run(function * (){
-      yield prom;
+    genny.run(function * (resume){
+      return false;
     }, end);
   }
 });

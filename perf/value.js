@@ -4,13 +4,10 @@ var thotGen = require('../');
 var co = require('co');
 var gen = require('gen-run');
 var suspend = require('suspend');
-var genny = require('genny');
 
 var Benchmark = require('benchmark');
 
 var suite = new Benchmark.Suite({'async': true, 'minSamples': 100});
-
-var prom = Promise.resolve(1);
 
 function done(deferred){
   return function(){
@@ -18,51 +15,15 @@ function done(deferred){
   };
 }
 
-suite.add('thot-gen promise', {
+suite.add('thot-gen value', {
   'defer': true,
   'async': true,
   'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     thotGen.run(function * (){
-      yield prom;
+      yield 1;
     })(end);
-  }
-});
-
-suite.add('co promise', {
-  'defer': true,
-  'async': true,
-  'minSamples': 100,
-  'fn': function(deferred){
-    var end = done(deferred);
-    co(function * (){
-      yield prom;
-    })(end);
-  }
-});
-
-suite.add('suspend prom', {
-  'defer': true,
-  'async': true,
-  'minSamples': 100,
-  'fn': function(deferred){
-    var end = done(deferred);
-    suspend.run(function * (){
-      yield prom;
-    }, end);
-  }
-});
-
-suite.add('genny prom', {
-  'defer': true,
-  'async': true,
-  'minSamples': 100,
-  'fn': function(deferred){
-    var end = done(deferred);
-    genny.run(function * (){
-      yield prom;
-    }, end);
   }
 });
 

@@ -4,6 +4,7 @@ var thotGen = require('../');
 var co = require('co');
 var gen = require('gen-run');
 var suspend = require('suspend');
+var genny = require('genny');
 
 var Benchmark = require('benchmark');
 
@@ -58,6 +59,18 @@ suite.add('suspend empty', {
   'fn': function(deferred){
     var end = done(deferred);
     suspend.run(function * (){
+      return false;
+    }, end);
+  }
+});
+
+suite.add('genny empty', {
+  'defer': true,
+  'async': true,
+  'minSamples': 100,
+  'fn': function(deferred){
+    var end = done(deferred);
+    genny.run(function * (resume){
       return false;
     }, end);
   }
