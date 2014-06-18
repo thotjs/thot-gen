@@ -4,6 +4,7 @@ var thotGen = require('../');
 var co = require('co');
 var gen = require('gen-run');
 var suspend = require('suspend');
+var genny = require('genny');
 
 var Benchmark = require('benchmark');
 
@@ -15,17 +16,16 @@ function done(deferred){
   };
 }
 
-function thunk(){
+var thunk = function thunk(){
   return function(cb){
-    cb(null, true);
+    cb();
   };
-}
+};
 
 suite.add('thot-gen thunk', {
   'defer': true,
   'async': true,
-  'minSamples': 1000,
-  'initCount': 100,
+  'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     thotGen.run(function * (){
@@ -38,8 +38,7 @@ suite.add('thot-gen thunk', {
 suite.add('co thunk', {
   'defer': true,
   'async': true,
-  'minSamples': 1000,
-  'initCount': 100,
+  'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     co(function * (){
@@ -52,8 +51,7 @@ suite.add('co thunk', {
 suite.add('gen-run thunk', {
   'defer': true,
   'async': true,
-  'minSamples': 1000,
-  'initCount': 100,
+  'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     gen(function * (){
@@ -66,11 +64,23 @@ suite.add('gen-run thunk', {
 suite.add('suspend thunk', {
   'defer': true,
   'async': true,
-  'minSamples': 1000,
-  'initCount': 100,
+  'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     suspend.run(function * (){
+      yield thunk();
+      return false;
+    }, end);
+  }
+});
+
+suite.add('genny thunk', {
+  'defer': true,
+  'async': true,
+  'minSamples': 100,
+  'fn': function(deferred){
+    var end = done(deferred);
+    genny.run(function * (resume){
       yield thunk();
       return false;
     }, end);

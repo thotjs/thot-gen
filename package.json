@@ -13,10 +13,14 @@
     "co": "^3.0.6",
     "gen-run": "^0.1.1",
     "genny": "^0.5.5",
+    "gulp": "^3.8.0",
+    "gulp-jshint": "^1.6.3",
+    "gulp-soften": "0.0.1",
+    "jshint-stylish": "^0.2.0",
     "suspend": "^0.5.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp"
   },
   "repository": {
     "type": "git",

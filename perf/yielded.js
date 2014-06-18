@@ -16,61 +16,57 @@ function done(deferred){
   };
 }
 
-suite.add('thot-gen empty', {
+var gen = function*(){
+
+};
+
+suite.add('thot-gen yielded', {
   'defer': true,
   'async': true,
   'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     thotGen.run(function * (){
+      var val = yield * gen();
       return false;
     })(end);
   }
 });
 
-suite.add('co empty', {
+suite.add('co yielded', {
   'defer': true,
   'async': true,
   'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     co(function * (){
+      var val = yield * gen();
       return false;
     })(end);
   }
 });
 
-suite.add('gen-run empty', {
-  'defer': true,
-  'async': true,
-  'minSamples': 100,
-  'fn': function(deferred){
-    var end = done(deferred);
-    gen(function * (){
-      return false;
-    }, end);
-  }
-});
-
-suite.add('suspend empty', {
+suite.add('suspend yielded', {
   'defer': true,
   'async': true,
   'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     suspend.run(function * (){
+      var val = yield * gen();
       return false;
     }, end);
   }
 });
 
-suite.add('genny empty', {
+suite.add('genny yielded', {
   'defer': true,
   'async': true,
   'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     genny.run(function * (resume){
+      var val = yield * gen();
       return false;
     }, end);
   }

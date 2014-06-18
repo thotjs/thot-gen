@@ -7,6 +7,12 @@ var co = Promise.coroutine;
 var delay = Promise.delay;
 var ctx = null;
 
+var bind = function bind(func, receiver){
+  return function(){
+    return func.apply(receiver, arguments);
+  };
+};
+
 var resume = function resume(func){
   return Promise.promisify(func, ctx);
 };
@@ -37,7 +43,12 @@ var sync = function sync(func){
 };
 
 var yieldHandler = function yieldHandler(value){
-  if(value && typeof value.then === 'function'){
+  // this is here so we don't have to call it at the front of each check if value is falsey
+  if(!value){
+    return Promise.resolve(value);
+  }
+
+  if(typeof value.then === 'function'){
     return value;
   }
 
@@ -45,13 +56,15 @@ var yieldHandler = function yieldHandler(value){
     return run(value).call(ctx);
   }
 
-  if(value && typeof value.next === 'function' && typeof value.throw === 'function'){
+  if(typeof value.next === 'function' && typeof value.throw === 'function'){
     var gen = genToGenFunc(value);
     return run(gen).call(ctx);
   }
 
   if(typeof value === 'function'){
-    return Promise.promisify(value, ctx)();
+    var def = Promise.defer();
+    try { value.call(ctx, def.callback); } catch(e) { def.reject(e); }
+    return def.promise;
   }
 
   if(Array.isArray(value)){
@@ -84,7 +97,7 @@ var run = function run(gen){
 
   return function(callback) {
     ctx = this;
-    var fn = co(gen.bind(ctx), {'yieldHandler': yieldHandler})().bind(ctx).cancellable();
+    var fn = co(bind(gen, ctx), {'yieldHandler': yieldHandler})().bind(ctx).cancellable();
 
     return fn.nodeify(callback);
   };

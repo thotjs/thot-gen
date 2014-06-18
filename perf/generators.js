@@ -3,8 +3,6 @@
 var thotGen = require('../');
 var co = require('co');
 var gen = require('gen-run');
-var suspend = require('suspend');
-var genny = require('genny');
 
 var Benchmark = require('benchmark');
 
@@ -16,30 +14,30 @@ function done(deferred){
   };
 }
 
-var genfunc = function * (){
+var gen = function*(){
 };
 
-suite.add('thot-gen generator functions', {
+suite.add('thot-gen generators', {
   'defer': true,
   'async': true,
   'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     thotGen.run(function * (){
-      yield genfunc;
+      yield gen();
       return false;
     })(end);
   }
 });
 
-suite.add('co empty', {
+suite.add('co generators', {
   'defer': true,
   'async': true,
   'minSamples': 100,
   'fn': function(deferred){
     var end = done(deferred);
     co(function * (){
-      yield genfunc;
+      yield gen();
       return false;
     })(end);
   }

@@ -32,7 +32,7 @@ run(function *(){
 });
 
 run(function *(){
-  yield final.delay(5000);
+  yield final.delay(100);
 })().then(function(){
   console.log('delay works');
 });
@@ -47,14 +47,14 @@ run(function *(){
 
 run(function *(){
   yield final.delay(1000);
-})().timeout(500).then(function(){
+})().timeout(100).then(function(){
   console.log('timeout didn\'t work');
 }, function(){
   console.log('timeout function worked');
 });
 
 var cancellable = run(function *(){
-  yield final.delay(500);
+  yield final.delay(100);
 })().then(function(){
   console.log('cancel did not work');
 }, function(){
