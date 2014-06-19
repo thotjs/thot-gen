@@ -28,7 +28,9 @@
     "Promise": true,
     "suite": true,
     "bench": true,
-    "set": true
+    "set": true,
+    "it": true,
+    "describe": true
   },
   "globalstrict": true,
   "sub": true,

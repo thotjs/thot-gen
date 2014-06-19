@@ -1,182 +1,242 @@
 'use strict';
-var final = require('../index');
-var run = final.run;
+var thot = require('../index');
+var run = thot.run;
+var Promise = require('bluebird');
+var assert = require('assert');
 
-var Q = require('q');
-
-function getPromise(val, err) {
-  return Q.fcall(function(){
-    if (err){
-      throw err;
-    }
-    return val;
-  });
+function getPromise(val) {
+  return Promise.resolve(val);
 }
 
-function thunk(){
+function thunk(val){
   return function(cb){
-    cb(null, 'Thunks Work');
+    cb(null, val);
   };
 }
 
-run(function *(){
-  var value = yield getPromise('Promises Work');
-  return value;
-})().then(function(result){
-  console.log(result);
-});
+describe('Thot-Gen', function(){
+  it('Should support promises', function(done){
+    run(function*(){
+      var value = yield getPromise('ok');
+      return value;
+    })(function(err, result){
+      assert.equal(err, null);
+      assert.equal(result, 'ok');
+      done();
+    });
+  });
 
-run(function *(){
-  yield final.delay(100);
-})().then(function(){
-  console.log('delay works');
-});
+  it('Should support delay', function(done){
+    run(function *(){
+      yield thot.delay(200);
+      return 1;
+    })(function(err, result){
+      assert.equal(err, null);
+      assert.equal(result, 1);
+      done();
+    });
+  });
 
-run(function *(){
-  console.log('inside context');
-  console.log(this);
-  yield true;
-}).call({'context': 'works'}).then(function(){
-  console.log('outside context');
-  console.log(this);
-});
+  it('Should Handle Contexts Properly', function(done){
+    var ctx = {'some': 'ctx'};
 
-run(function *(){
-  yield final.delay(1000);
-})().timeout(100).then(function(){
-  console.log('timeout didn\'t work');
-}, function(){
-  console.log('timeout function worked');
-});
+    run(function *(){
+      assert.equal(this, ctx);
+      yield true;
+      return true;
+    }).call(ctx, function(err, result){
+      assert.equal(this, ctx);
+      assert.equal(err, null);
+      assert.equal(result, true);
+      done();
+    });
+  });
 
-var cancellable = run(function *(){
-  yield final.delay(100);
-})().then(function(){
-  console.log('cancel did not work');
-}, function(){
-  console.log('cancel did work');
-});
-cancellable.cancel();
+  it('Should work with timeout', function(done){
+    run(function *(){
+      yield thot.delay(1000);
+    })().timeout(100).then(null, function(err){
+      assert.notEqual(err, null);
+      done();
+    });
+  });
 
-run(function *(){
-  var val = yield 'standard values work';
-  return val;
-})().then(function(result){
-  console.log(result);
-});
+  it('Should support cancelling the promise', function(done) {
+    var cancellable = run(function *(){
+      yield thot.delay(100);
+    })().then(null, function(err){
+      assert.notEqual(err, null);
+      done();
+    });
+    cancellable.cancel();
+  });
 
-run(function *(){
-  var val = yield function *(){
-    yield final.delay(100);
-    return this;
-  };
-  return val;
-}).call({'nested': 'ctx'}).then(function(result){
-  console.log(result);
-});
+  it('Should handle non-standard values', function(done){
+    run(function *(){
+      var bool = yield true;
+      return bool;
+    })(function(err, result){
+      assert.equal(err, null);
+      assert.equal(result, true);
+      done();
+    });
+  });
 
-run(function *(){
-  yield (function *(){
-    yield true;
-    return true;
-  })();
-  return 'yielding generators directly works';
-})().then(function(result){
-  console.log(result);
-}, function(err){
-  console.log(err);
-});
+  it('Should support nested contexts', function(done) {
+    var ctx = {'nested': ctx};
+    run(function*() {
+      var val = yield function *() {
+        assert.equal(this, ctx);
+        yield thot.delay(100);
+        assert.equal(this, ctx);
+        return 2;
+      };
+      return val;
+    }).call(ctx, function (err, result) {
+      assert.equal(this, ctx);
+      assert.equal(err, null);
+      assert.equal(result, 2);
+      done();
+    });
+  });
 
-run(function *(){
-  var tmp = yield * (function *(){
-    yield true;
-    return true;
-  })();
-  yield tmp;
-  return 'yielding generators with yield * works';
-})().then(function(result){
-  console.log(result);
-}, function(err){
-  console.log(err);
-});
+  it('Should support yielding generators directly', function(done){
+    run(function*(){
+      var bool = yield function *(){
+        var boolean = yield true;
+        return boolean;
+      };
+      return bool;
+    })(function(err, result){
+      assert.equal(err, null);
+      assert.equal(result, true);
+      done();
+    });
+  });
 
-run(function *(){
-  var val = yield thunk();
-  return val;
-})().then(function(result){
-  console.log(result);
-});
+  it('Should allow yield *', function(done){
+    var gen = (function*(){
+      yield true;
+      return true;
+    })();
+    run(function*(){
+      var tmp = yield * gen;
+      return tmp;
+    })(function(err, result){
+      assert.equal(err, null);
+      assert.equal(result, true);
+      done();
+    });
+  });
 
-run(function *(){
-  var val = yield final.sync(function(){
-    return 'Sync Functions Work';
-  })();
-  return val;
-})().then(function(result){
-  console.log(result);
-});
+  it('Should allow yielding thunks', function(done){
+    run(function*(){
+      var val = yield thunk(1);
+      return val;
+    })(function(err, result){
+      assert.equal(err, null);
+      assert.equal(result, 1);
+      done();
+    });
+  });
 
-run(function *(){
-  var val = yield final.sync(function(){
-    throw new Error('Sync function errors are trapped');
-  })();
-  return val;
-})().then(function(result){
-  console.log(result);
-}, function(err){
-  console.log(err);
-});
+  it('Should support synchronous functions', function(done){
+    run(function*(){
+      var val = yield (function(){
+        return 1;
+      })();
+      return val;
+    })(function(err, result){
+      assert.equal(err, null);
+      assert.equal(result, 1);
+      done();
+    });
+  });
 
-run(function *(){
-  var val = yield final.resume(function(cb){
-    cb(null, 'Async Functions Work');
-  })();
-  return val;
-})().then(function(result){
-  console.log(result);
-});
+  it('Should support trapping synchronous errors', function(done){
+    run(function*(){
+      var val = yield (function(){
+        throw new Error('Boom');
+      })();
+      return val;
+    })(function(err, result){
+      assert.notEqual(err, null);
+      assert.equal(result, null);
+      done();
+    });
+  });
 
-run(function *(){
-  var val = yield final.resume(function(){
-    throw new Error('Async function throws are caught');
-  })();
-  return val;
-})().then(function(result){
-  console.log(result);
-}, function(err){
-  console.log(err);
-});
+  it('Should support async functions', function(done){
+    run(function*(){
+      var val = yield thot.resume(function(cb){
+        cb(null, 1);
+      })();
+      return val;
+    })(function(err, result){
+      assert.equal(err, null);
+      assert.equal(result, 1);
+      done();
+    });
+  });
 
-run(function *(){
-  var val = yield final.resume(function(cb){
-    cb('Async cb errors are caught');
-  })();
-  return val;
-})().then(function(result){
-  console.log(result);
-}, function(err){
-  console.log(err.message);
-});
+  it('Should catch async errors', function(done){
+    run(function*(){
+      var val = yield thot.resume(function(){
+        throw new Error('Boom');
+      })();
+      return val;
+    })(function(err, result) {
+      assert.notEqual(err, null);
+      assert.equal(result, null);
+      done();
+    });
+  });
 
-run(function *(){
-  var val = yield final.resumeRaw(function(cb){
-    cb('raw', 'resume', 'works');
-  })();
-  return val;
-})().then(function(result){
-  console.log(result);
-});
+  it('Should catch async callback errors', function(done){
+    run(function*(){
+      var val = yield thot.resume(function(cb){
+        cb(new Error('Boom'));
+      })();
+      return val;
+    })(function(err, result) {
+      assert.notEqual(err, null);
+      assert.equal(result, null);
+      done();
+    });
+  });
 
-run(function *(){
-  var val = yield ['arrays', 'work'];
-  return val;
-})().then(function(result){
-  console.log(result);
-});
+  it('Should support non standard callbacks', function(done){
+    run(function*(){
+      var val = yield thot.resumeRaw(function(cb){
+        cb('raw', 'resume', 'works');
+      })();
+      return val;
+    })(function(err, result){
+      assert.equal(err, null);
+      assert.equal(Array.isArray(result), true);
+      done();
+    });
+  });
 
-run(function *(){
-  var val = yield {'objects': 'work'};
-  return val;
-})().then(function(result){
-  console.log(result);
+  it('Should support arrays', function(done){
+    run(function*(){
+      var arr = yield [thunk(), getPromise(1)];
+      return arr;
+    })(function(err, result){
+      assert.equal(err, null);
+      assert.equal(Array.isArray(result), true);
+      done();
+    });
+  });
+
+  it('Should support objects', function(done){
+    run(function*(){
+      var arr = yield {'thunk': thunk(), 'promise': getPromise(1)};
+      return arr;
+    })(function(err, result){
+      assert.equal(err, null);
+      assert.equal(typeof result, 'object');
+      done();
+    });
+  });
 });

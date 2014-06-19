@@ -26,7 +26,7 @@ var genToGenFunc = function genToGenFunc(gen){
 };
 
 var resumeRaw = function resumeRaw(func){
-  return function(cb){
+  return Promise.promisify(function(cb){
     var args = slice(arguments);
     args[args.length - 1] = function(){
       var data = slice(arguments);
@@ -34,7 +34,7 @@ var resumeRaw = function resumeRaw(func){
     };
 
     func.apply(ctx, args);
-  };
+  });
 };
 
 var yieldHandler = function yieldHandler(value){
