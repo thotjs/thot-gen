@@ -3,7 +3,6 @@
 var gulp = require('gulp');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
-var soften = require('gulp-soften');
 
 var paths = {
   'srcFiles': ['./**/*.js', '!node_modules{,/**}']
@@ -11,11 +10,13 @@ var paths = {
 
 gulp.task('default', ['lint', 'test']);
 
-gulp.task('lint', function lint(){
+gulp.task('soften', function soften(){
   gulp.src(paths.srcFiles)
     .pipe(soften(2))
     .pipe(gulp.dest('./'));
+});
 
+gulp.task('lint', function lint(){
   gulp.src(paths.srcFiles)
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))

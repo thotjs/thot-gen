@@ -1,11 +1,11 @@
 'use strict';
 
 var slice = require('sliced');
-var _ = require('lodash');
 var Promise = require('bluebird');
 var co = Promise.coroutine;
 var delay = Promise.delay;
 var ctx = null;
+var thunkify = require('thunkify');
 
 var bind = function bind(func, receiver){
   return function(){
@@ -14,7 +14,7 @@ var bind = function bind(func, receiver){
 };
 
 var resume = function resume(func){
-  return Promise.promisify(func, ctx);
+  return thunkify(func);
 };
 
 var genToGenFunc = function genToGenFunc(gen){
@@ -26,20 +26,15 @@ var genToGenFunc = function genToGenFunc(gen){
 };
 
 var resumeRaw = function resumeRaw(func){
-  return Promise.promisify(function(cb){
+  return function(cb){
     var args = slice(arguments);
-    args.pop();
-    args.push(function(){
+    args[args.length - 1] = function(){
       var data = slice(arguments);
       cb(null, data);
-    });
+    };
 
     func.apply(ctx, args);
-  });
-};
-
-var sync = function sync(func){
-  return Promise.method(func.bind(ctx));
+  };
 };
 
 var yieldHandler = function yieldHandler(value){
@@ -67,20 +62,14 @@ var yieldHandler = function yieldHandler(value){
     return def.promise;
   }
 
-  if(Array.isArray(value)){
-    _.forEach(value, function(val, index){
+  if(typeof value === 'object' || Array.isArray(value)){
+    value = Object.keys(value);
+
+    value.forEach(function(val, index){
       value[index] = yieldHandler(val);
     });
 
     return Promise.all(value);
-  }
-
-  if(typeof value === 'object'){
-    _.forOwn(value, function(val, index){
-      value[index] = yieldHandler(val);
-    });
-
-    return Promise.props(value);
   }
 
   return Promise.resolve(value);
@@ -106,7 +95,6 @@ var run = function run(gen){
 module.exports = {
   'run': run,
   'resume': resume,
-  'sync': sync,
   'resumeRaw': resumeRaw,
   'delay': delay
 };

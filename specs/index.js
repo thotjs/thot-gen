@@ -20,11 +20,6 @@ function thunk(){
 }
 
 run(function *(){
-})().then(function(){
-  console.log('empty generator functions work');
-});
-
-run(function *(){
   var value = yield getPromise('Promises Work');
   return value;
 })().then(function(result){
@@ -40,6 +35,7 @@ run(function *(){
 run(function *(){
   console.log('inside context');
   console.log(this);
+  yield true;
 }).call({'context': 'works'}).then(function(){
   console.log('outside context');
   console.log(this);
@@ -80,9 +76,10 @@ run(function *(){
 });
 
 run(function *(){
-  yield function *(){
+  yield (function *(){
+    yield true;
     return true;
-  }();
+  })();
   return 'yielding generators directly works';
 })().then(function(result){
   console.log(result);
@@ -91,9 +88,11 @@ run(function *(){
 });
 
 run(function *(){
-  yield * function *(){
+  var tmp = yield * (function *(){
+    yield true;
     return true;
-  }();
+  })();
+  yield tmp;
   return 'yielding generators with yield * works';
 })().then(function(result){
   console.log(result);
@@ -138,7 +137,7 @@ run(function *(){
 });
 
 run(function *(){
-  var val = yield final.resume(function(cb){
+  var val = yield final.resume(function(){
     throw new Error('Async function throws are caught');
   })();
   return val;

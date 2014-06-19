@@ -6,10 +6,10 @@
   "dependencies": {
     "bluebird": "^2.1.2",
     "lodash": "^2.4.1",
-    "sliced": "0.0.5"
+    "sliced": "0.0.5",
+    "thunkify": "^2.1.2"
   },
   "devDependencies": {
-    "benchmark": "^1.0.0",
     "co": "^3.0.6",
     "gen-run": "^0.1.1",
     "genny": "^0.5.5",
@@ -17,6 +17,7 @@
     "gulp-jshint": "^1.6.3",
     "gulp-soften": "0.0.1",
     "jshint-stylish": "^0.2.0",
+    "matcha": "^0.5.0",
     "suspend": "^0.5.1"
   },
   "scripts": {

@@ -25,7 +25,10 @@
   "node": true,
   "gcl": true,
   "globals": {
-    "Promise": true
+    "Promise": true,
+    "suite": true,
+    "bench": true,
+    "set": true
   },
   "globalstrict": true,
   "sub": true,
