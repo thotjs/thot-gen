@@ -7,3 +7,4 @@ install:
 notifications:
   email:
     - jfugett@thotjs.io
+  hipchat: gNU4S5WPTogC6ol40SOMOL8fY5PsRyPEVTEvytYV@ThotJS
