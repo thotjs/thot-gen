@@ -3,7 +3,6 @@ thot-gen
 
 High performance bluebird based generator control flow library
 
-[![Code Climate](https://codeclimate.com/github/thotjs/thot-gen.png)](https://codeclimate.com/github/thotjs/thot-gen)
 [![Build Status](https://travis-ci.org/thotjs/thot-gen.svg)](https://travis-ci.org/thotjs/thot-gen)
 [![Dependency Status](https://david-dm.org/thotjs/thot-gen.svg)](https://david-dm.org/thotjs/thot-gen)
 [![devDependency Status](https://david-dm.org/thotjs/thot-gen/dev-status.svg)](https://david-dm.org/thotjs/thot-gen#info=devDependencies)
