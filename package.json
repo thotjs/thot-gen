@@ -1,6 +1,6 @@
 {
   "name": "thot-gen",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Generator control flow based on bluebird",
   "main": "index.js",
   "dependencies": {

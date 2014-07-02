@@ -70,7 +70,11 @@ var yieldHandler = function yieldHandler(value){
       value[index] = yieldHandler(val);
     });
 
-    return Promise.all(value);
+    if(Array.isArray(value)){
+      return Promise.all(value);
+    } else {
+      return Promise.props(value);
+    }
   }
 
   return Promise.resolve(value);
