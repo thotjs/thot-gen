@@ -63,9 +63,10 @@ var yieldHandler = function yieldHandler(value){
   }
 
   if(typeof value === 'object' || Array.isArray(value)){
-    value = Object.keys(value);
+    var keyArr = Object.keys(value);
 
-    value.forEach(function(val, index){
+    keyArr.forEach(function(index){
+      var val = value[index];
       value[index] = yieldHandler(val);
     });
 
